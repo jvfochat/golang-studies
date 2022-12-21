@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -16,7 +18,7 @@ const delay = 5
 func main() {
 
 	displaysIntroduction()
-	leSitesDoArquivo()
+
 	for {
 
 		displaysMenu()
@@ -27,8 +29,8 @@ func main() {
 		case 1:
 			iniciarMonitorando()
 		case 2:
-			fmt.Println("menu")
-
+			fmt.Println("exibirLogs")
+			imprimeLogs()
 		case 0:
 			fmt.Println("close")
 			os.Exit(0)
@@ -53,7 +55,7 @@ func displaysIntroduction() {
 
 func displaysMenu() {
 	fmt.Println("1- monitorando")
-	fmt.Println("2- menu")
+	fmt.Println("2- exibirLogs")
 	fmt.Println("0- close")
 }
 
@@ -131,4 +133,23 @@ func leSitesDoArquivo() []string {
 
 func registraLog(site string, status bool) {
 
+	arquivo, err := os.OpenFile("log.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	arquivo.WriteString(time.Now().Format("02/01/2006 15:04:05") + "-" + "- online: " + strconv.FormatBool(status) + "\n")
+
+	arquivo.Close()
+}
+
+func imprimeLogs() {
+
+	arquivo, err := ioutil.ReadFile("log.txt")
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(arquivo))
 }
